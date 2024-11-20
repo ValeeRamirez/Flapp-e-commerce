@@ -1,49 +1,38 @@
 const axios = require('axios');
 
 class ProductService {
-    async getAllProducts(page = 1) {
+    async getAllProducts() {
+        let allProducts = [];
+        let page = 1;
+
         try {
-            const response = await axios.get(`https://dummyjson.com/products?limit=10&skip=${(page - 1) * 10}`);
-            return response.data.products;
+            let response = await axios.get(`https://dummyjson.com/products?limit=10&skip=0`);
+            const totalProducts = response.data.total;
+            allProducts = [...allProducts, ...response.data.products];
+
+            while (allProducts.length < totalProducts) {
+                response = await axios.get(`https://dummyjson.com/products?limit=10&skip=${page * 10}`);
+                allProducts = [...allProducts, ...response.data.products];
+                page++;
+            }
+            return allProducts;
         } catch (error) {
             console.error('Error fetching products:', error);
             throw error;
         }
     }
 
-    // async getProductDetails(productIds) {
-    //     const allProducts = await this.getAllProducts();
-    //     console.log('All products:', allProducts);
-    //     return productIds.map(id => {
-    //         const product = allProducts.find(p => p.id.toString() === id);
-    //         return {
-    //             id: product.id,
-    //             name: product.title,
-    //             stock: product.stock,
-    //             rating: product.rating
-    //         };
-    //     });
-    // }
     async getProductDetails(productIds) {
-        try {
-            // Obtener cada producto individualmente
-            const productPromises = productIds.map(id =>
-                axios.get(`https://dummyjson.com/products/${id}`)
-                    .then(response => response.data)
-            );
-
-            const products = await Promise.all(productPromises);
-
-            return products.map(product => ({
+        const allProducts = await this.getAllProducts();
+        return productIds.map(id => {
+            const product = allProducts.find(p => p.id.toString() === id);
+            return {
                 id: product.id,
                 name: product.title,
                 stock: product.stock,
                 rating: product.rating
-            }));
-        } catch (error) {
-            console.error('Error fetching product details:', error);
-            throw error;
-        }
+            };
+        });
     }
 
     calculateRealStock(stock, rating) {

@@ -21,8 +21,10 @@ Proyecto de e-commerce que simula un carrito de compras utilizando la API de Dum
 
 ## Supuestos
 - El stock real se calcula dividiendo el stock por el rating
-- Los descuentos son aleatorios
 - El precio de envío es fijo en $3.670
+- La api dummmys siempre tendra los detalles de los productos que esta misma generó para un carrito
+- Los precios de los productos siempre estan en la misma moneda
+
 
 ## Notas Adicionales
 - Usar puerto 3001 para backend
